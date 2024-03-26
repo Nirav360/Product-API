@@ -5,14 +5,12 @@ const {
   loginUser,
   logoutUser,
   registerUser,
+  refresh,
 } = require("../controllers/userController.js");
-const { verifyJWT } = require("../middleware/auth.js");
 
 router.route("/register").post(registerUser);
-
 router.route("/login").post(loginUser);
-
-//secured routes
-router.route("/logout").post(verifyJWT, logoutUser);
+router.route("/refresh").get(refresh);
+router.route("/logout").post(logoutUser);
 
 module.exports = router;
