@@ -3,19 +3,37 @@ const { asyncHandler } = require("../utils/asyncHandler");
 const ErrorHandler = require("../utils/errorHandler");
 
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find();
+  const products = await Product.find({});
   return res.status(200).json({ success: true, product: products });
 });
 
 const createProduct = asyncHandler(async (req, res, next) => {
-  const { title, description, price } = req.body;
-  if (!title || !description || !price) {
-    return next(new ErrorHandler(400, "All fields are required"));
-  }
-  await Product.create({
+  const {
     title,
     description,
     price,
+    stock,
+    brand,
+    category,
+    thumbnail,
+    images,
+  } = req.body;
+
+  if (
+    !title ||
+    !description ||
+    !price ||
+    !stock ||
+    !brand ||
+    !category ||
+    !thumbnail ||
+    !Array.isArray(images)
+  ) {
+    return next(new ErrorHandler(400, "All fields are required"));
+  }
+  await Product.create({
+    ...req.body,
+    owner: req.user._id,
   });
   return res
     .status(201)
