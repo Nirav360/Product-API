@@ -149,7 +149,7 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(204); //No content
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
-  res.json({ message: "Cookie cleared" });
+  res.json(new ApiResponse(200, null, "Cookie cleared"));
 });
 
 module.exports = {

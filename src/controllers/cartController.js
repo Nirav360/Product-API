@@ -108,10 +108,7 @@ const deleteCart = asyncHandler(async (req, res, next) => {
       message: `${item.title} deleted from cart successfully`,
     });
   } else {
-    return res.status(404).json({
-      success: false,
-      message: `Product not found`,
-    });
+    return next(new ErrorHandler(404, "Product not found"));
   }
 });
 

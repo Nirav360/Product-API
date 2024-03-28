@@ -8,7 +8,7 @@ const cors = require("cors");
 const { errorMiddleware } = require("./middleware/errorMiddleware");
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 connectDB();
 
