@@ -4,7 +4,7 @@ const ErrorHandler = require("../utils/errorHandler");
 
 const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({});
-  return res.status(200).json({ success: true, product: products });
+  return res.status(200).json({ success: true, products });
 });
 
 const createProduct = asyncHandler(async (req, res, next) => {

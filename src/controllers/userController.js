@@ -59,8 +59,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
 const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email) {
-    return next(new ErrorHandler(400, "Email is required"));
+  if (!email || !password) {
+    return next(new ErrorHandler(400, "All fields are required"));
   }
 
   const user = await User.findOne({ email });
@@ -82,9 +82,9 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   // Create secure cookie with refresh token
   res.cookie("jwt", refreshToken, {
-    httpOnly: true, //accessible only by web server
-    secure: true, //https
-    sameSite: "None", //cross-site cookie
+    httpOnly: false, //accessible only by web server
+    // secure: true, //https
+    // sameSite: "None", //cross-site cookie
     maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
   });
 
@@ -148,8 +148,9 @@ const refresh = asyncHandler(async (req, res, next) => {
 const logoutUser = asyncHandler(async (req, res, next) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(204); //No content
-  res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
-  res.json(new ApiResponse(200, null, "Cookie cleared"));
+  return res
+    .clearCookie("jwt", { httpOnly: false })
+    .json(new ApiResponse(200, null, "Cookie cleared"));
 });
 
 module.exports = {
