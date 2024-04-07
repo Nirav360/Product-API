@@ -4,7 +4,13 @@ const ErrorHandler = require("../utils/errorHandler");
 
 const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({});
-  return res.status(200).json({ success: true, products });
+  const productsWithTrendingFlag = products.map((product) => ({
+    ...product.toObject(),
+    trendingProduct: product.rating > 4.5 ? true : false,
+  }));
+  return res
+    .status(200)
+    .json({ success: true, products: productsWithTrendingFlag });
 });
 
 const createProduct = asyncHandler(async (req, res, next) => {
@@ -74,10 +80,25 @@ const deleteProduct = asyncHandler(async (req, res) => {
     .json({ success: true, message: "Product Deleted Successfully" });
 });
 
+const getCategories = asyncHandler(async (req, res, next) => {
+  const products = await Product.find({}, "category");
+  const categories = products.map((product) => product.category);
+  const uniqueCategory = [...new Set(categories)];
+  return res.status(200).json(uniqueCategory);
+});
+
+const getProductByCategory = asyncHandler(async (req, res, next) => {
+  const { category } = req.params;
+  const products = await Product.find({ category });
+  return res.status(200).json({ products });
+});
+
 module.exports = {
   getProducts,
   createProduct,
   getProduct,
   deleteProduct,
   updateProduct,
+  getCategories,
+  getProductByCategory,
 };
