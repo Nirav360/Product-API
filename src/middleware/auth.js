@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 const { asyncHandler } = require("../utils/asyncHandler");
 
-const verifyJWT = asyncHandler(async (req, _, next) => {
+const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || req.headers.Authorization;
 
@@ -17,17 +17,13 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
       return next(new ErrorHandler(401, "Unauthorized request"));
     }
 
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-    const user = await User.findById(decodedToken?._id);
-
-    if (!user) {
-      return next(new ErrorHandler(401, "Invalid Access Token"));
-    }
-
-    req.user = user;
-    next();
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) return res.status(403).json({ message: "Forbidden" });
+      req.user = decoded;
+      next();
+    });
   } catch (error) {
+    console.log(error);
     return next(
       new ErrorHandler(401, error?.message || "Invalid access token")
     );

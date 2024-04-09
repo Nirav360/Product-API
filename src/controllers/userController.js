@@ -127,22 +127,19 @@ const refresh = asyncHandler(async (req, res, next) => {
 
   const refreshToken = cookies.jwt;
 
-  const decodedToken = jwt.verify(
+  jwt.verify(
     refreshToken,
-    process.env.REFRESH_TOKEN_SECRET
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, decoded) => {
+      if (err) return res.status(403).json({ message: "Forbidden" });
+      const foundUser = await User.findById(decoded._id);
+      if (!foundUser) {
+        return next(new ErrorHandler(401, "Invalid Access Token"));
+      }
+      const accessToken = await foundUser.generateAccessToken();
+      res.json({ accessToken });
+    }
   );
-
-  if (!decodedToken) return next(new ErrorHandler(401, "Unauthorized request"));
-
-  const foundUser = await User.findById(decodedToken?._id);
-
-  if (!foundUser) {
-    return next(new ErrorHandler(401, "Invalid Access Token"));
-  }
-
-  const accessToken = await foundUser.generateAccessToken();
-
-  res.json({ accessToken });
 });
 
 const logoutUser = asyncHandler(async (req, res, next) => {

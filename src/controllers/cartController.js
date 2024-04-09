@@ -33,9 +33,10 @@ const createCart = asyncHandler(async (req, res, next) => {
     //If cart already exists for user,
     if (cart) {
       const itemIndex = cart.products.findIndex(
-        (item) => item.itemId === itemId
+        (item) => item.itemId.toString() === itemId
       );
-      //check if product exists increase the quantity by 1 and update the bill
+
+      //check if product exists update the quantity and update the bill
       if (itemIndex > -1) {
         let product = cart.products[itemIndex];
         product.quantity += quantity;
@@ -47,11 +48,7 @@ const createCart = asyncHandler(async (req, res, next) => {
         return res
           .status(200)
           .json(
-            new ApiResponse(
-              200,
-              cart,
-              "Product Quantity is incremented by 1 in cart"
-            )
+            new ApiResponse(200, cart, "Product Quantity is updated in cart")
           );
       } else {
         // if product does not exist in cart for the user add the product in cart
@@ -89,7 +86,9 @@ const deleteCart = asyncHandler(async (req, res, next) => {
   const itemId = req.query.itemId;
   let cart = await Cart.findOne({ owner });
 
-  const itemIndex = cart.products.findIndex((item) => item.itemId === itemId);
+  const itemIndex = cart.products.findIndex(
+    (item) => item.itemId.toString() === itemId
+  );
 
   if (itemIndex > -1) {
     let item = cart.products[itemIndex];
